@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待办事项</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container" id="appContainer">
+        <header class="app-header" id="appHeader">
+            <h1>待办事项</h1>
+            <div class="header-actions">
+                <button id="minimizeBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 16px;">−</button>
+                <button id="closeBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 16px;">×</button>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="todo-input-container">
+                <input type="text" id="todoInput" placeholder="添加新的待办事项..." maxlength="200">
+                <button id="addTodo" class="btn btn-primary">添加</button>
+            </div>
+            
+            <div class="todo-stats">
+                <span id="todoCount">0 个项目</span>
+                <span id="completedCount">0 个已完成</span>
+            </div>
+            
+            <div class="todo-list-container">
+                <div id="todoList" class="todo-list">
+                    <div class="empty-state">
+                        <p>还没有待办事项</p>
+                        <p class="empty-subtext">添加你的第一个任务开始吧！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="renderer.js"></script>
+    <script>
+        // 窗口控制功能
+        document.addEventListener('DOMContentLoaded', () => {
+            const minimizeBtn = document.getElementById('minimizeBtn');
+            const closeBtn = document.getElementById('closeBtn');
+            const appHeader = document.getElementById('appHeader');
+            
+            if (minimizeBtn) {
+                minimizeBtn.addEventListener('click', () => {
+                    if (window.electronAPI && window.electronAPI.minimize) {
+                        window.electronAPI.minimize();
+                    }
+                });
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    if (window.electronAPI && window.electronAPI.close) {
+                        window.electronAPI.close();
+                    }
+                });
+            }
+            
+            // 窗口拖拽功能
+            if (appHeader) {
+                appHeader.addEventListener('mousedown', (e) => {
+                    if (e.target.closest('.header-actions')) return;
+                    e.preventDefault();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

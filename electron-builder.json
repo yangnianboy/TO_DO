@@ -1,0 +1,30 @@
+{
+  "appId": "com.example.todoapp",
+  "productName": "待办事项",
+  "directories": {
+    "output": "dist"
+  },
+  "files": [
+    "main.js",
+    "preload.js",
+    "index.html",
+    "styles.css",
+    "renderer.js",
+    "package.json"
+  ],
+  "win": {
+    "target": [
+      "nsis",
+      "portable"
+    ],
+    "artifactName": "${productName}-${version}-${arch}.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "shortcutName": "待办事项"
+  },
+  "portable": {
+    "artifactName": "${productName}-便携版-${version}-${arch}.${ext}"
+  }
+}
