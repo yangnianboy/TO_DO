@@ -22,9 +22,15 @@
                 <button id="addTodo" class="btn btn-primary">添加</button>
             </div>
             
-            <div class="todo-stats">
-                <span id="todoCount">0 个项目</span>
-                <span id="completedCount">0 个已完成</span>
+            <div class="todo-stats" aria-live="polite">
+                <div class="stats-left">
+                    <span id="todoCount">0 个项目</span>
+                    <span class="stats-sep">·</span>
+                    <span id="completedCount">0 个已完成</span>
+                </div>
+                <div class="stats-right">
+                    <button id="clearCompleted" class="btn btn-ghost" title="清除所有已完成的待办">清除已完成</button>
+                </div>
             </div>
             
             <div class="todo-list-container">
