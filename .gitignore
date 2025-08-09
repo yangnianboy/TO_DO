@@ -21,3 +21,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+test-persistence.js
+test-data-persistence.js
+verify-persistence.js

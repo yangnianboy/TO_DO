@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs').promises;
+const os = require('os');
 
 // 创建浏览器窗口
 function createWindow() {
@@ -30,7 +32,9 @@ function createWindow() {
 }
 
 // 应用程序生命周期
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  // 初始化数据存储
+  await initializeDataStorage();
   createWindow();
 
   app.on('activate', () => {
@@ -42,15 +46,55 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-// 待办事项数据存储
-let todos = [];
+// 数据存储相关函数
+const dataDir = path.join(os.homedir(), '.todo-app');
+const dataFile = path.join(dataDir, 'todos.json');
+
+// 初始化数据存储
+async function initializeDataStorage() {
+  try {
+    await fs.mkdir(dataDir, { recursive: true });
+    // 检查数据文件是否存在
+    try {
+      await fs.access(dataFile);
+    } catch {
+      // 文件不存在，创建默认文件
+      await fs.writeFile(dataFile, '[]', 'utf8');
+    }
+  } catch (error) {
+    console.error('Failed to initialize data storage:', error);
+  }
+}
+
+// 读取待办事项数据
+async function readTodos() {
+  try {
+    const data = await fs.readFile(dataFile, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Failed to read todos:', error);
+    return [];
+  }
+}
+
+// 写入待办事项数据
+async function writeTodos(todos) {
+  try {
+    await fs.writeFile(dataFile, JSON.stringify(todos, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Failed to write todos:', error);
+  }
+}
 
 // IPC处理函数
 const ipcHandlers = {
   // 待办事项操作
-  'get-todos': () => todos,
+  'get-todos': async () => {
+    return await readTodos();
+  },
   
-  'add-todo': (event, todo) => {
+  'add-todo': async (event, todo) => {
+    const todos = await readTodos();
     const newTodo = {
       id: Date.now(),
       text: todo.text,
@@ -58,24 +102,31 @@ const ipcHandlers = {
       createdAt: new Date().toISOString()
     };
     todos.push(newTodo);
+    await writeTodos(todos);
     return newTodo;
   },
   
-  'update-todo': (event, updatedTodo) => {
+  'update-todo': async (event, updatedTodo) => {
+    const todos = await readTodos();
     const index = todos.findIndex(todo => todo.id === updatedTodo.id);
     if (index !== -1) {
       todos[index] = updatedTodo;
+      await writeTodos(todos);
     }
     return updatedTodo;
   },
   
-  'delete-todo': (event, id) => {
-    todos = todos.filter(todo => todo.id !== id);
+  'delete-todo': async (event, id) => {
+    const todos = await readTodos();
+    const filteredTodos = todos.filter(todo => todo.id !== id);
+    await writeTodos(filteredTodos);
     return true;
   },
   
-  'clear-completed': () => {
-    todos = todos.filter(todo => !todo.completed);
+  'clear-completed': async () => {
+    const todos = await readTodos();
+    const filteredTodos = todos.filter(todo => !todo.completed);
+    await writeTodos(filteredTodos);
     return true;
   },
   
