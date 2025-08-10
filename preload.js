@@ -8,10 +8,12 @@ const api = {
   updateTodo: (todo) => ipcRenderer.invoke('update-todo', todo),
   deleteTodo: (id) => ipcRenderer.invoke('delete-todo', id),
   clearCompleted: () => ipcRenderer.invoke('clear-completed'),
+  reorderTodos: (idOrder) => ipcRenderer.invoke('reorder-todos', idOrder),
   
   // 窗口操作
   minimize: () => ipcRenderer.invoke('minimize-window'),
-  close: () => ipcRenderer.invoke('close-window')
+  close: () => ipcRenderer.invoke('close-window'),
+  toggleZoom: () => ipcRenderer.invoke('toggle-zoom')
 };
 
 // 暴露安全的API给渲染进程

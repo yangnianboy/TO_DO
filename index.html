@@ -3,23 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self';">
     <title>待办事项</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="app-container" id="appContainer">
         <header class="app-header" id="appHeader">
-            <h1>待办事项</h1>
-            <div class="header-actions">
-                <button id="minimizeBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 16px;">−</button>
-                <button id="closeBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 16px;">×</button>
+            <div class="window-controls" aria-label="窗口控制">
+                <button id="btnClose" class="traffic-light close" title="关闭" aria-label="关闭"></button>
+                <button id="btnMinimize" class="traffic-light minimize" title="最小化" aria-label="最小化"></button>
+                <button id="btnZoom" class="traffic-light zoom" title="缩放" aria-label="缩放"></button>
             </div>
+            <h1>待办事项</h1>
         </header>
         
         <div class="content">
             <div class="todo-input-container">
                 <input type="text" id="todoInput" placeholder="添加新的待办事项..." maxlength="200">
                 <button id="addTodo" class="btn btn-primary">添加</button>
+            </div>
+
+            <div class="toolbar">
+                <div class="segmented" role="tablist" aria-label="过滤">
+                    <button id="filterAll" class="segment active" role="tab" aria-selected="true" data-filter="all">全部</button>
+                    <button id="filterActive" class="segment" role="tab" aria-selected="false" data-filter="active">未完成</button>
+                    <button id="filterCompleted" class="segment" role="tab" aria-selected="false" data-filter="completed">已完成</button>
+                </div>
+                <input id="searchInput" class="btn-ghost" style="min-width:180px;padding:6px 10px;border-radius:10px;border:1px solid var(--mac-stroke);background:#fff" placeholder="搜索 (#标签 / 关键字)" aria-label="搜索">
+                <div class="tag-filters" aria-label="标签筛选"></div>
             </div>
             
             <div class="todo-stats" aria-live="polite">
@@ -45,37 +57,5 @@
     </div>
     
     <script src="renderer.js"></script>
-    <script>
-        // 窗口控制功能
-        document.addEventListener('DOMContentLoaded', () => {
-            const minimizeBtn = document.getElementById('minimizeBtn');
-            const closeBtn = document.getElementById('closeBtn');
-            const appHeader = document.getElementById('appHeader');
-            
-            if (minimizeBtn) {
-                minimizeBtn.addEventListener('click', () => {
-                    if (window.electronAPI && window.electronAPI.minimize) {
-                        window.electronAPI.minimize();
-                    }
-                });
-            }
-            
-            if (closeBtn) {
-                closeBtn.addEventListener('click', () => {
-                    if (window.electronAPI && window.electronAPI.close) {
-                        window.electronAPI.close();
-                    }
-                });
-            }
-            
-            // 窗口拖拽功能
-            if (appHeader) {
-                appHeader.addEventListener('mousedown', (e) => {
-                    if (e.target.closest('.header-actions')) return;
-                    e.preventDefault();
-                });
-            }
-        });
-    </script>
 </body>
 </html>

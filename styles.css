@@ -14,6 +14,10 @@
     --radius-md: 12px;
     --radius-sm: 8px;
     --card-gap: 10px;
+    --mac-header-grad-1: #f6f7fb;
+    --mac-header-grad-2: #eceff5;
+    --mac-stroke: #d6d9e0;
+    --mac-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 1px 2px rgba(0,0,0,.06);
 }
 
 * {
@@ -44,6 +48,7 @@ body {
     max-height: 100vh;
     background: var(--bg-glass);
     backdrop-filter: blur(12px) saturate(160%);
+    z-index: 10;
     -webkit-backdrop-filter: blur(12px) saturate(160%);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
@@ -52,7 +57,8 @@ body {
     padding: 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    position: relative;
     transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
@@ -61,30 +67,60 @@ body {
     -webkit-app-region: drag;
     -webkit-user-select: none;
     user-select: none;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px 25px;
+    background: linear-gradient(180deg, var(--mac-header-grad-1), var(--mac-header-grad-2));
+    padding: 12px 16px 14px;
     text-align: center;
     position: relative;
     flex-shrink: 0;
+    border-bottom: 1px solid var(--mac-stroke);
 }
+
+/* 交通灯符号提示 */
+.traffic-light::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    display: grid; place-items: center;
+    font-size: 11px; line-height: 1; color: rgba(0,0,0,.45);
+    opacity: 0; transition: opacity .15s ease;
+}
+.traffic-light.close::before { content: '×'; }
+.traffic-light.minimize::before { content: '–'; }
+.traffic-light.zoom::before { content: '+'; }
+.traffic-light:hover::before { opacity: .9; }
 
 .app-header h1 {
-    font-size: 1.6rem;
+    font-size: 15px;
     font-weight: 600;
-    color: white;
-    letter-spacing: -0.5px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    margin: 0;
+    color: #111827;
+    letter-spacing: -0.2px;
+    margin: 2px 0 0;
 }
 
-.header-actions {
+.window-controls {
     -webkit-app-region: no-drag;
     position: absolute;
-    top: 15px;
-    right: 15px;
+    left: 12px;
+    top: 12px;
     display: flex;
     gap: 8px;
+    z-index: 10;
 }
+
+.traffic-light {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,.06);
+    box-shadow: 0 0 0 1px rgba(0,0,0,.03) inset, 0 1px 1px rgba(0,0,0,.06);
+    background: #ddd;
+    cursor: pointer;
+    position: relative;
+}
+.traffic-light.close { background: #ff5f57; }
+.traffic-light.minimize { background: #febc2e; }
+.traffic-light.zoom { background: #28c840; }
+.traffic-light:hover { filter: brightness(1.05); }
+.traffic-light:focus-visible { outline: 2px solid rgba(0,0,0,.25); outline-offset: 1px; }
 
 /* 按钮样式 */
 .btn {
@@ -142,6 +178,14 @@ body {
     border-color: #e2e8f0;
 }
 
+.btn-ghost[disabled], .btn-ghost[aria-disabled="true"] {
+    color: #b0b9c6;
+    background: #fafafa;
+    border-color: #eaecef;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
 /* 主要内容区域 */
 .content {
     padding: 20px;
@@ -150,6 +194,26 @@ body {
     flex-direction: column;
     overflow: hidden;
 }
+
+/* 工具栏与分段控件 */
+.segmented {
+    display: inline-flex;
+    background: #fff;
+    border: 1px solid var(--mac-stroke);
+    border-radius: 10px;
+    box-shadow: var(--mac-shadow);
+    overflow: hidden;
+}
+.segment {
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--text-2);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+.segment + .segment { border-left: 1px solid var(--mac-stroke); }
+.segment.active { background: #f2f4f8; color: #0f172a; font-weight: 600; }
 
 /* 输入区域 */
 .todo-input-container {
@@ -252,7 +316,7 @@ body {
     scrollbar-width: thin;
     scrollbar-color: var(--brand-1) #e2e8f0;
     padding-right: 2px;
-    padding: 8px;
+    padding: 10px 10px 12px;
 }
 
 /* 滚动条样式 */
@@ -287,17 +351,73 @@ body {
     padding: 14px 14px;
     margin: var(--card-gap) 4px;
     background: #fff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    border: 1px solid var(--mac-stroke);
+    border-radius: 12px;
+    box-shadow: var(--mac-shadow);
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-    animation: fadeIn 0.25s ease;
 }
 
 .todo-item:hover {
-    transform: translateY(-2px);
-    border-color: #e2e8f0;
-    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+    border-color: #cfd3db;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+/* 拖动视觉：被拖动卡片与占位符 */
+.todo-list.drag-active { cursor: grabbing; user-select: none; }
+.todo-item.dragging {
+    opacity: 0.9;
+    transform: scale(1.02) translateY(0) rotate(0.25deg);
+    box-shadow: 0 12px 28px rgba(0,0,0,.16);
+    border-color: #cfd3db;
+    filter: saturate(1.05);
+    cursor: grabbing !important;
+}
+.todo-item.dragging .todo-actions { opacity: 0; }
+.drop-placeholder {
+    margin: var(--card-gap) 4px;
+    border: 2px dashed rgba(79, 172, 254, 0.35);
+    border-radius: 12px;
+    background: rgba(79, 172, 254, 0.06);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+}
+
+@keyframes placeholderFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.drop-placeholder.animated { animation: placeholderFade 120ms ease-out; }
+
+/* 已取消拖动手柄设计（整卡可拖） — 故移除相关样式 */
+
+/* 标签与优先级 */
+.meta { display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+.tag-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 6px; border-radius: 10px; font-size: 11px;
+    background: #eef6ff; color: #2563eb; border: 1px solid #dbeafe;
+}
+.tag-chip[data-color="1"] { background:#fff5f5; color:#dc2626; border-color:#fee2e2; }
+.tag-chip[data-color="2"] { background:#fffbeb; color:#d97706; border-color:#fef3c7; }
+.tag-chip[data-color="3"] { background:#ecfdf5; color:#059669; border-color:#d1fae5; }
+
+.priority { display: inline-flex; align-items: center; gap: 6px; }
+.priority-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.priority-p1 { background:#ef4444; box-shadow: 0 0 0 2px #fee2e2; }
+.priority-p2 { background:#f59e0b; box-shadow: 0 0 0 2px #fde68a; }
+.priority-p3 { background:#10b981; box-shadow: 0 0 0 2px #a7f3d0; }
+
+/* 工具条：标签筛选与排序控件 */
+.toolbar { display: flex; justify-content: center; margin: 6px 0 12px; gap: 8px; flex-wrap: wrap; }
+.tag-filters { display: inline-flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.tag-filters:empty { display: none; }
+.tag-filter { padding: 4px 8px; border-radius: 999px; font-size: 11px; border:1px solid var(--mac-stroke); background:#fff; cursor:pointer; }
+.tag-filter.active { background:#f2f4f8; font-weight:600; }
+
+/* 焦点可见性（通用） */
+button:focus-visible, .segment:focus-visible, .tag-filter:focus-visible {
+    outline: 2px solid rgba(79,172,254,.8); outline-offset: 2px;
 }
 
 .todo-checkbox {
@@ -456,21 +576,43 @@ body {
     }
 }
 
-/* 动画效果 */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.todo-item {
-    animation: fadeIn 0.3s ease;
-}
+/* 动画效果（仅使用 cardIn/cardOut） */
 
 /* 悬停效果 */
 .app-container:hover { box-shadow: var(--shadow-hover); }
+
+/* 更丝滑的入场/删除动画与触控反馈 */
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(4px) scale(0.995); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes cardOut {
+    from { opacity: 1; transform: none; }
+    to { opacity: 0; transform: translateY(4px) scale(0.995); }
+}
+.todo-item.enter { animation: cardIn 240ms cubic-bezier(0.22, 1, 0.36, 1); }
+.todo-item.leaving { animation: cardOut 160ms cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.btn:active { transform: translateY(0) scale(0.98); }
+.icon-btn:active { transform: translateY(0) scale(0.96); }
+
+/* 图标按钮风格（编辑/删除） */
+.todo-actions .icon-btn {
+    width: 28px; height: 28px;
+    padding: 0;
+    border: 1px solid var(--mac-stroke);
+    border-radius: 8px;
+    background: #fff;
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    box-shadow: var(--mac-shadow);
+    cursor: pointer;
+    transition: background-color .15s ease, transform .15s ease, border-color .15s ease;
+}
+.todo-actions .icon-btn:hover { background: #f3f4f6; transform: translateY(-1px); border-color: #e5e7eb; }
+.todo-actions .icon-btn:active { transform: translateY(0); }
+.icon-glyph { font-size: 14px; line-height: 1; }
+
+/* 减少动态偏好 */
+@media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+}
