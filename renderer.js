@@ -98,7 +98,7 @@ async function addTodo() {
   const text = elements.todoInput.value.trim();
   if (text) {
     const newTodo = await window.electronAPI.addTodo({ text });
-    addTodoToUI(newTodo);
+    addTodoToUI(newTodo, true);
     elements.todoInput.value = '';
     updateStats();
     
@@ -115,7 +115,7 @@ async function loadTodos() {
   if (todos.length === 0) {
     showEmptyState();
   } else {
-    todos.forEach(todo => addTodoToUI(todo));
+    todos.forEach(todo => addTodoToUI(todo, false));
   }
   
   updateStats();
@@ -148,14 +148,18 @@ async function clearCompleted() {
 }
 
 // UI操作
-function addTodoToUI(todo) {
+function addTodoToUI(todo, atTop = true) {
   const emptyState = elements.todoList.querySelector('.empty-state');
   if (emptyState) {
     emptyState.remove();
   }
 
   const todoItem = createTodoItemElement(todo);
-  elements.todoList.prepend(todoItem);
+  if (atTop) {
+    elements.todoList.prepend(todoItem);
+  } else {
+    elements.todoList.appendChild(todoItem);
+  }
   // 事件由委托处理，无需逐项绑定
 }
 
